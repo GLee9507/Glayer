@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="com.gene.glayer.ui.GlayerClient" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ui.MainActivity">
+
+        <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/bottomBar"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+                android:id="@+id/bottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+        <ImageView
+                android:id="@+id/ivAlbum"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="10dp"
+                android:src="@mipmap/ic_launcher_round"
+                app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+                app:layout_constraintLeft_toLeftOf="@id/bottomBar"
+                app:layout_constraintTop_toTopOf="@id/bottomBar" />
+
+        <TextView
+                android:id="@+id/tvSongTitle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="@{GlayerClient.INSTANCE.playMedia.title}"
+                android:textColor="@android:color/black"
+                android:textSize="22dp"
+                app:layout_constraintBottom_toTopOf="@id/tvSingerTitle"
+                app:layout_constraintLeft_toRightOf="@id/ivAlbum"
+                app:layout_constraintRight_toLeftOf="@id/btnPlay"
+                app:layout_constraintTop_toTopOf="@id/ivAlbum"
+                app:layout_constraintVertical_chainStyle="spread" />
+
+        <TextView
+                android:id="@+id/tvSingerTitle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="@{GlayerClient.INSTANCE.playMedia.artist}"
+                app:layout_constraintBottom_toBottomOf="@id/ivAlbum"
+                app:layout_constraintLeft_toRightOf="@id/ivAlbum"
+                app:layout_constraintRight_toLeftOf="@id/btnPlay"
+                app:layout_constraintTop_toBottomOf="@id/tvSongTitle" />
+
+        <ImageButton
+                android:id="@+id/btnNext"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginRight="10dp"
+                android:src="@android:drawable/ic_media_next"
+                app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+                app:layout_constraintRight_toRightOf="@id/bottomBar"
+                app:layout_constraintTop_toTopOf="@id/bottomBar" />
+
+        <ImageButton
+                android:id="@+id/btnPlay"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginRight="10dp"
+                android:src="@android:drawable/ic_media_play"
+                app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+                app:layout_constraintRight_toLeftOf="@id/btnNext"
+                app:layout_constraintTop_toTopOf="@+id/bottomBar" />
+
+        <ProgressBar
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progress="@{GlayerClient.INSTANCE.playProgress}"
+                android:max="@{GlayerClient.INSTANCE.playMedia.duration}"
+                app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+                app:layout_constraintLeft_toLeftOf="@id/bottomBar"
+                app:layout_constraintRight_toRightOf="@id/bottomBar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
