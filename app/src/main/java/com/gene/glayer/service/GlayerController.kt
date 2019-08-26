@@ -11,14 +11,19 @@ import com.gene.glayer.*
 import com.gene.glayer.model.Media
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.flac.FlacLibrary
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import java.util.concurrent.CopyOnWriteArrayList
 
 class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.EventListener {
+
+
     private val glayerHandler by lazy {
         val handlerThread = HandlerThread("glayer_handler")
         handlerThread.start()
-        Handler(handlerThread.looper,this)
+        Handler(handlerThread.looper, this)
     }
 
     private val player by lazy {
@@ -126,6 +131,26 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
 
     private val playBlock by lazy { Runnable { player.playWhenReady = true } }
     private val pauseBlock by lazy { Runnable { player.playWhenReady = false } }
+    private currentPlayList:
+    override fun setPlayList(name: String?, playList: IntArray?) {
+        if (name == null || playList == null) return
+        glayerHandler.post {
+            mediaRepo.get()?.apply {
+                val currentList = Array<MediaSource>(playList.size, init = {
+                    val id = playList[it]
+                    val media = getById(id)
+                    dataSourceFactory.createMediaSource(Uri.parse(media.data))
+                })
+                val mediaSource = ConcatenatingMediaSource(
+                    true,
+                    true,
+                    ShuffleOrder.DefaultShuffleOrder(0),
+                    *currentList
+                )
+            }
+
+        }
+    }
 
     override fun play() {
         glayerHandler.post(playBlock)
@@ -141,6 +166,9 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
 
     override fun onPlayerError(error: ExoPlaybackException?) {
         Log.d("errpr", error?.message)
+    }
+
+    override fun onLoadingChanged(isLoading: Boolean) {
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -161,6 +189,4 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
             it.listener.onPlayStateChanged(state)
         }
     }
-
-
 }

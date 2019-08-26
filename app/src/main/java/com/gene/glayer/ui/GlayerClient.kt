@@ -4,26 +4,16 @@ import android.app.Service
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Handler
 import android.os.IBinder
 import android.util.Log
-import androidx.core.util.Pools
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.gene.glayer.APP
-import com.gene.glayer.IGlayerController
-import com.gene.glayer.EventListener
-import com.gene.glayer.MediaListMap
+import com.gene.glayer.*
 import com.gene.glayer.model.Media
-import com.gene.glayer.service.GlayerController
 import com.gene.glayer.service.GlayerService
-import java.time.Duration
-import java.util.*
 
 object GlayerClient : IGlayerController.Default(), ServiceConnection {
     val mediaList by lazy { MutableLiveData<MediaListMap>() }
-    val mediaState by lazy { MutableLiveData<Int>() }
+    val playState by lazy { MutableLiveData<Int>() }
     val playProgress by lazy { MutableLiveData<Int>() }
     val playDuration by lazy { MutableLiveData<Int>() }
     val playMedia by lazy { MutableLiveData<Media>() }
@@ -33,7 +23,7 @@ object GlayerClient : IGlayerController.Default(), ServiceConnection {
     private val eventListener by lazy {
         object : EventListener.Stub() {
             override fun onPlayStateChanged(state: Int) {
-                mediaState.postValue(state)
+                playState.postValue(state)
             }
 
             override fun onPlayListChanged(list: MutableList<Media>?) {
@@ -84,6 +74,17 @@ object GlayerClient : IGlayerController.Default(), ServiceConnection {
     override fun prepare(id: Int) {
         glayerController?.prepare(id)
     }
+
+    fun playOrPause() {
+        glayerController?.apply {
+            if (this@GlayerClient.playState.value == PLAY_STATE_PLAYING) {
+                pause()
+            } else {
+                play()
+            }
+        }
+    }
+
 
     fun connect() {
         APP.bindService(intent, this, Service.BIND_AUTO_CREATE)
