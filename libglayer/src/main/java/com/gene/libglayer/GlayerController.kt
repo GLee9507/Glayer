@@ -1,4 +1,4 @@
-package com.gene.glayer.service
+package com.gene.libglayer
 
 
 import android.net.Uri
@@ -7,10 +7,8 @@ import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
 import androidx.databinding.Observable
-import com.gene.glayer.*
-import com.gene.glayer.model.Media
+import com.gene.libglayer.model.Media
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ext.flac.FlacLibrary
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ShuffleOrder
@@ -100,7 +98,12 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
     }
 
     override fun registerEventListenerListener(uuid: String, listener: EventListener?) {
-        if (listener != null) listenerWrappers.add(EventListenerWrapper(uuid, listener))
+        if (listener != null) listenerWrappers.add(
+            EventListenerWrapper(
+                uuid,
+                listener
+            )
+        )
     }
 
     override fun scan(path: String?) {
@@ -131,7 +134,6 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
 
     private val playBlock by lazy { Runnable { player.playWhenReady = true } }
     private val pauseBlock by lazy { Runnable { player.playWhenReady = false } }
-    private currentPlayList:
     override fun setPlayList(name: String?, playList: IntArray?) {
         if (name == null || playList == null) return
         glayerHandler.post {

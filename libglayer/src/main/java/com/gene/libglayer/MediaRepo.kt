@@ -1,4 +1,4 @@
-package com.gene.glayer.service
+package com.gene.libglayer
 
 import android.annotation.SuppressLint
 import android.database.ContentObserver
@@ -7,10 +7,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.databinding.ObservableField
-import com.gene.glayer.APP
-import com.gene.glayer.IO
-import com.gene.glayer.MediaListMap
-import com.gene.glayer.model.Media
+import com.gene.libglayer.model.Media
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

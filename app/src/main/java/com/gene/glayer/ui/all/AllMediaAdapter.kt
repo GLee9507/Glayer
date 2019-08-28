@@ -4,13 +4,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.gene.glayer.R
-import com.gene.glayer.model.Media
 import com.gene.glayer.ui.GlayerClient
+import com.gene.libglayer.model.Media
 
-class AllMediaAdapter : ListAdapter<Media, AllMediaViewHolder>(Media.ITEM_CALLBACK) {
+val MEDIA_CALLBACK by lazy {
+    object : DiffUtil.ItemCallback<Media>() {
+        override fun areItemsTheSame(oldItem: Media, newItem: Media) = oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: Media, newItem: Media) = false
+    }
+
+}
+
+class AllMediaAdapter : ListAdapter<Media, AllMediaViewHolder>(MEDIA_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         AllMediaViewHolder(
             LayoutInflater.from(parent.context!!).inflate(

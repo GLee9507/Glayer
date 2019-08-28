@@ -1,7 +1,7 @@
-package com.gene.glayer
+package com.gene.libglayer
 
 import android.util.SparseArray
-import com.gene.glayer.model.Media
+import com.gene.libglayer.model.Media
 
 class MediaListMap : MutableIterable<Media> {
 

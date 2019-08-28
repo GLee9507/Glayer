@@ -1,5 +1,5 @@
 // Media.aidl
-package com.gene.glayer.model;
+package com.gene.libglayer.model;
 
 // Declare any non-default types here with import statements
 parcelable Media;

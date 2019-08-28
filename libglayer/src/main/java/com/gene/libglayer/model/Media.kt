@@ -1,8 +1,7 @@
-package com.gene.glayer.model
+package com.gene.libglayer.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.recyclerview.widget.DiffUtil
 
 data class Media(
     val title: String? = "",
@@ -58,14 +57,6 @@ data class Media(
         val CREATOR: Parcelable.Creator<Media> = object : Parcelable.Creator<Media> {
             override fun createFromParcel(source: Parcel): Media = Media(source)
             override fun newArray(size: Int): Array<Media?> = arrayOfNulls(size)
-        }
-
-        val ITEM_CALLBACK = object : DiffUtil.ItemCallback<Media>() {
-            override fun areItemsTheSame(oldItem: Media, newItem: Media) = oldItem.id == newItem.id
-
-
-            override fun areContentsTheSame(oldItem: Media, newItem: Media) = true
-
         }
     }
 }

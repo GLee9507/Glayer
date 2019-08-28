@@ -1,1 +1,1 @@
-include ':app', ':flac'
+include ':app', ':flac', ':libglayer'

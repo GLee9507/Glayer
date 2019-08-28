@@ -1,9 +1,9 @@
 // IGlayerController.aidl
-package com.gene.glayer;
+package com.gene.libglayer;
 
 // Declare any non-default types here with import statements
-import com.gene.glayer.EventListener;
-import com.gene.glayer.model.Media;
+import com.gene.libglayer.EventListener;
+import com.gene.libglayer.model.Media;
 
 
 interface IGlayerController {

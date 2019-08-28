@@ -1,8 +1,8 @@
 // EventListener.aidl
-package com.gene.glayer;
+package com.gene.libglayer;
 
 // Declare any non-default types here with import statements
-import com.gene.glayer.model.Media;
+import com.gene.libglayer.model.Media;
 
 interface  EventListener {
   oneway void onPlayListChanged(in List<Media> list);

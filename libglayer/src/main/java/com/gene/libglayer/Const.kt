@@ -1,8 +1,7 @@
-package com.gene.glayer
+package com.gene.libglayer
 
 import android.app.Application
 import android.os.Handler
-import android.os.HandlerThread
 import android.os.Looper
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.FileDataSourceFactory

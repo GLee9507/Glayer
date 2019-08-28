@@ -1,4 +1,4 @@
-package com.gene.glayer;
+package com.gene.libglayer;
 
 import android.app.Application;
 
