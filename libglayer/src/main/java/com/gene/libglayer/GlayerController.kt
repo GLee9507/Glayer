@@ -2,34 +2,32 @@ package com.gene.libglayer
 
 
 import android.net.Uri
-import android.os.Handler
-import android.os.HandlerThread
+import android.os.Bundle
 import android.os.Message
-import android.util.Log
 import androidx.databinding.Observable
 import com.gene.libglayer.model.Media
-import com.google.android.exoplayer2.*
+import com.gene.libglayer.state.StateMachineCore
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import java.util.concurrent.CopyOnWriteArrayList
 
-class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.EventListener {
+
+class GlayerController : IGlayerController.Stub(), IController {
 
 
-    private val glayerHandler by lazy {
-        val handlerThread = HandlerThread("glayer_handler")
-        handlerThread.start()
-        Handler(handlerThread.looper, this)
-    }
+    private val core by lazy { StateMachineCore(this) }
 
     private val player by lazy {
         ExoPlayerFactory.newSimpleInstance(
             APP,
             DefaultRenderersFactory(APP).apply { setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON) },
-            DefaultTrackSelector(), DefaultLoadControl(), null, glayerHandler.looper
-        ).apply { addListener(this@GlayerController) }
+            DefaultTrackSelector(), DefaultLoadControl(), null, core.looper
+        ).apply { addListener(core) }
     }
 
 
@@ -74,28 +72,6 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
         mediaRepo.searchAndUpdate()
     }
 
-    private fun startCallbackProgress() {
-        glayerHandler.sendEmptyMessage(CALLBACK_PROGRESS)
-    }
-
-    private fun stopCallbackProgress() {
-        glayerHandler.removeMessages(CALLBACK_PROGRESS)
-    }
-
-    override fun handleMessage(msg: Message): Boolean {
-        when (msg.what) {
-            CALLBACK_PROGRESS -> {
-                listenerWrappers.forEach {
-                    it.listener.onProgressChanged(
-                        player.currentPosition.toInt(),
-                        player.duration.toInt()
-                    )
-                }
-                glayerHandler.sendEmptyMessageDelayed(CALLBACK_PROGRESS, 1000)
-            }
-        }
-        return false
-    }
 
     override fun registerEventListenerListener(uuid: String, listener: EventListener?) {
         if (listener != null) listenerWrappers.add(
@@ -105,90 +81,87 @@ class GlayerController : IGlayerController.Stub(), Handler.Callback, Player.Even
             )
         )
     }
+    override fun currentPosition() = player.currentPosition
 
-    override fun scan(path: String?) {
-        mediaRepo.scan(path)
+    override fun currentIndex() = player.currentWindowIndex
+
+    override fun stop() {
+        player.stop()
     }
 
-    override fun prepare(id: Int) {
-        glayerHandler.post {
-            player.stop()
-            var realId = UNKNOWN_ID
-            mediaRepo.get()?.getById(id)?.apply {
-                realId = id
-                player.playWhenReady = true
-
-                player.prepare(
-                    dataSourceFactory.createMediaSource(
-                        Uri.parse(data)
-                    ),
-                    true,
-                    true
-                )
-            }
-            listenerWrappers.forEach {
-                it.listener.onPlayMediaChanged(realId)
-            }
-        }
+    override fun reset() {
+        player.stop(true)
     }
 
-    private val playBlock by lazy { Runnable { player.playWhenReady = true } }
-    private val pauseBlock by lazy { Runnable { player.playWhenReady = false } }
-    override fun setPlayList(name: String?, playList: IntArray?) {
-        if (name == null || playList == null) return
-        glayerHandler.post {
-            mediaRepo.get()?.apply {
-                val currentList = Array<MediaSource>(playList.size, init = {
-                    val id = playList[it]
-                    val media = getById(id)
-                    dataSourceFactory.createMediaSource(Uri.parse(media.data))
-                })
-                val mediaSource = ConcatenatingMediaSource(
-                    true,
-                    true,
-                    ShuffleOrder.DefaultShuffleOrder(0),
-                    *currentList
-                )
+    override fun scan(bundle: Bundle) {
+        mediaRepo.scan(bundle.getString(CTRL_SCAN_PATH))
+    }
+
+
+    override fun moveTo(bundle: Bundle) {
+        bundle.getInt(CTRL_MOVE_TO_INDEX, -1).apply {
+            if (this >= 0) {
+                play()
+                player.seekTo(this, 0)
             }
 
         }
     }
 
-    override fun play() {
-        glayerHandler.post(playBlock)
+    override fun seekTo(bundle: Bundle) {
+        bundle.getLong(CTRL_SEEK_TO_POSITION, -1).apply {
+            if (this >= 0) {
+                play()
+                player.seekTo(this)
+            }
+
+        }
     }
 
-    override fun pause() {
-        glayerHandler.post(pauseBlock)
+    override fun setPlayList(bundle: Bundle) {
+        val tag = bundle.getString(CTRL_SET_LIST_TAG, "")
+        val playList = bundle.getIntArray(CTRL_SET_LIST_PLAY_LIST)!!
+        val autoPlay = bundle.getBoolean(CTRL_SET_LIST_AUTO_PLAY)
+        val playIndex = bundle.getInt(CTRL_SET_LIST_PLAY_INDEX)
+        mediaRepo.get()?.apply {
+            val currentList = Array<MediaSource>(playList.size, init = {
+                val id = playList[it]
+                val media = getById(id)
+                dataSourceFactory.createMediaSource(Uri.parse(media.data))
+            })
+
+            val mediaSource = ConcatenatingMediaSource(
+                true,
+                true,
+                ShuffleOrder.DefaultShuffleOrder(0),
+                *currentList
+            )
+        }
+    }
+
+
+    override fun send(msg: Message) {
+        core.sendMessage(msg)
     }
 
     fun onCleared() {
         mediaRepo.onCleared()
     }
 
-    override fun onPlayerError(error: ExoPlaybackException?) {
-        Log.d("errpr", error?.message)
-    }
 
-    override fun onLoadingChanged(isLoading: Boolean) {
-    }
-
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        var state = 0
-        if (playbackState == Player.STATE_READY) {
-            state = if (playWhenReady) {
-                startCallbackProgress()
-
-                PLAY_STATE_PLAYING
-            } else {
-                stopCallbackProgress()
-                PLAY_STATE_PAUSE
-            }
-        }
-
-
+    override fun callback(function: (EventListener) -> Unit) {
         listenerWrappers.forEach {
-            it.listener.onPlayStateChanged(state)
+            function.invoke(it.listener)
         }
     }
+
+    override fun play() {
+        player.playWhenReady = true
+    }
+
+    override fun pause() {
+        player.playWhenReady = false
+    }
+
+
 }

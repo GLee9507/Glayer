@@ -13,7 +13,24 @@ const val PLAY_STATE_PAUSE = 2
 const val PLAY_STATE_IDEL = 3
 
 
-const val CALLBACK_PROGRESS = -11
+const val CTRL_PLAY = 1
+const val CTRL_PAUSE = 2
+const val CTRL_SCAN = 3
+const val CTRL_SCAN_PATH = "ctrl_scan"
+
+const val CTRL_SET_LIST = 4
+const val CTRL_SET_LIST_TAG = "tag"
+const val CTRL_SET_LIST_PLAY_INDEX = "play_index"
+const val CTRL_SET_LIST_AUTO_PLAY = "auto_play"
+const val CTRL_SET_LIST_PLAY_LIST = "play_list"
+
+const val CTRL_MOVE_TO = 5
+const val CTRL_MOVE_TO_INDEX = "index"
+
+const val CTRL_SEEK_TO = 6
+const val CTRL_SEEK_TO_POSITION = "position"
+
+
 const val UNKNOWN_ID = -1
 
 val APP: Application by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -32,6 +49,11 @@ fun runOnMain(block: Runnable) {
 
 inline fun runOnMain(crossinline block: () -> Unit) {
     mainHandler.post { block.invoke() }
+}
+
+inline fun consume(block: () -> Unit): Boolean {
+    block()
+    return true
 }
 
 val mainHandler by lazy { Handler(Looper.getMainLooper()) }
