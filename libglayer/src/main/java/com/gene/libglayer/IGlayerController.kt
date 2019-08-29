@@ -1,7 +1,6 @@
 package com.gene.libglayer
 
 import android.os.Bundle
-import android.util.Log
 
 interface IController {
     fun play()
@@ -9,6 +8,8 @@ interface IController {
     fun stop()
     fun reset()
     fun seekTo(bundle: Bundle)
+    fun next()
+    fun pre()
     fun moveTo(bundle: Bundle)
     fun setPlayList(bundle: Bundle)
     fun callback(function: (EventListener) -> Unit)

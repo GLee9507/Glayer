@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.gene.glayer.R
-import com.gene.glayer.ui.GlayerClient
 import com.gene.libglayer.model.Media
 
 val MEDIA_CALLBACK by lazy {
@@ -43,7 +42,6 @@ class AllMediaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     init {
         view.setOnClickListener {
             data?.apply {
-                GlayerClient.prepare(id)
             }
         }
     }

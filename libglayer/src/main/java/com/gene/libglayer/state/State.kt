@@ -2,12 +2,19 @@ package com.gene.libglayer.state
 
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
 import androidx.collection.ArrayMap
 
 abstract class State(val core: StateMachineCore) {
 
-    abstract fun enter(bundle: Bundle?)
-    abstract fun quit()
+    public open fun enter(bundle: Bundle?) {
+        Log.d("STATE", "enter : " + javaClass.simpleName)
+    }
+
+    public  open fun quit() {
+        Log.d("STATE", "quit : " + javaClass.simpleName)
+
+    }
 
     abstract fun handle(msg: Message): Boolean
 

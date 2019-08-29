@@ -5,7 +5,7 @@ package com.gene.libglayer;
 import com.gene.libglayer.model.Media;
 
 interface  EventListener {
-  oneway void onPlayListChanged(in List<Media> list);
+  oneway void onAllListChanged(in Media[] medialist);
   oneway void onPlayMediaChanged(int id);
   oneway void onProgressChanged(long  progress);
   oneway void onPlayStateChanged(int state);

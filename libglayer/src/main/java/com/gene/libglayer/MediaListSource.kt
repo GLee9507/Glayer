@@ -6,17 +6,25 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ShuffleOrder
 
-class MediaList(
-    name: String,
+class MediaListSource(
+    val tag: String,
     isAtomic: Boolean,
     useLazyPreparation: Boolean,
     shuffleOrder: ShuffleOrder,
-    mediaArray: Array<Media>
+    val mediaListMap: MediaListMap
 ) : ConcatenatingMediaSource(
     isAtomic,
     useLazyPreparation,
     shuffleOrder,
-    *Array<MediaSource>(mediaArray.size) {
-        dataSourceFactory.createMediaSource(Uri.parse(mediaArray[it].data))
-    }) {
+    *Array(mediaListMap.size()) {
+        dataSourceFactory.createMediaSource(
+            Uri.parse(
+                mediaListMap.getAt(
+                    it
+                ).data
+            )
+        )
+    }
+) {
+
 }

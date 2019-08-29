@@ -9,6 +9,5 @@ import android.os.Message;
 interface IGlayerController {
     void registerEventListenerListener(in String uuid,EventListener listener);
 
-
-    void send(in Message msg);
+    void send(in Bundle data);
 }

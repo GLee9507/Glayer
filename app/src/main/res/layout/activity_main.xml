@@ -3,7 +3,9 @@
 
     <data>
 
-        <import type="com.gene.glayer.ui.GlayerClient" />
+        <variable
+                name="viewModel"
+                type="com.gene.glayer.ui.MainViewModel" />
 
         <import type="com.gene.libglayer.GlayerKt" />
     </data>
@@ -48,7 +50,7 @@
                 android:layout_height="0dp"
                 android:layout_marginLeft="10dp"
                 android:gravity="center_vertical"
-                android:text="@{GlayerClient.INSTANCE.playMedia.title}"
+                android:text="@{viewModel.playMedia.title}"
                 android:textColor="@android:color/black"
                 android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@id/tvSingerTitle"
@@ -63,7 +65,7 @@
                 android:layout_height="0dp"
                 android:layout_marginLeft="10dp"
                 android:gravity="center_vertical"
-                android:text="@{GlayerClient.INSTANCE.playMedia.artist}"
+                android:text="@{viewModel.playMedia.artist}"
                 app:layout_constraintBottom_toBottomOf="@id/ivAlbum"
                 app:layout_constraintLeft_toRightOf="@id/ivAlbum"
                 app:layout_constraintRight_toLeftOf="@id/btnPlay"
@@ -73,6 +75,8 @@
                 android:id="@+id/btnNext"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:onClick="@{()->viewModel.presenter.next()}"
+
                 android:layout_marginRight="10dp"
                 android:src="@android:drawable/ic_media_next"
                 app:layout_constraintBottom_toBottomOf="@id/bottomBar"
@@ -84,9 +88,9 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginRight="10dp"
-                android:src="@{GlayerClient.INSTANCE.playState==ConstKt.PLAY_STATE_PLAYING?@android:drawable/ic_media_pause:@android:drawable/ic_media_play}"
+                android:onClick="@{()->viewModel.presenter.playOrPause()}"
+                android:src="@{viewModel.playState==GlayerKt.PLAY_STATE_PLAYING?@android:drawable/ic_media_pause:@android:drawable/ic_media_play}"
                 app:layout_constraintBottom_toBottomOf="@id/bottomBar"
-                android:onClick="@{()->GlayerClient.INSTANCE.playOrPause()}"
                 app:layout_constraintRight_toLeftOf="@id/btnNext"
                 app:layout_constraintTop_toTopOf="@+id/bottomBar" />
 
@@ -94,8 +98,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="@{GlayerClient.INSTANCE.playMedia.duration}"
-                android:progress="@{GlayerClient.INSTANCE.playProgress}"
+                android:max="@{viewModel.playMedia.duration}"
+                android:progress="@{viewModel.playProgress}"
                 app:layout_constraintBottom_toBottomOf="@id/bottomBar"
                 app:layout_constraintLeft_toLeftOf="@id/bottomBar"
                 app:layout_constraintRight_toRightOf="@id/bottomBar" />

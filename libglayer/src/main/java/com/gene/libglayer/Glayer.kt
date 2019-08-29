@@ -10,11 +10,12 @@ import kotlinx.coroutines.Dispatchers
 
 const val PLAY_STATE_PLAYING = 1
 const val PLAY_STATE_PAUSE = 2
-const val PLAY_STATE_IDEL = 3
+const val PLAY_STATE_IDLE = 3
 
+const val NO_MEDIA_ID = -1
 
-const val CTRL_PLAY = 1
-const val CTRL_PAUSE = 2
+const val WHAT = "WHAT"
+const val CTRL_PLAY_OR_PAUSE = 1
 const val CTRL_SCAN = 3
 const val CTRL_SCAN_PATH = "ctrl_scan"
 
@@ -29,6 +30,9 @@ const val CTRL_MOVE_TO_INDEX = "index"
 
 const val CTRL_SEEK_TO = 6
 const val CTRL_SEEK_TO_POSITION = "position"
+
+const val CTRL_NEXT = 7
+const val CTRL_PRE = 8
 
 
 const val UNKNOWN_ID = -1
