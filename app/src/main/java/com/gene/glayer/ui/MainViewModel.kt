@@ -6,8 +6,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.gene.libglayer.*
 import com.gene.libglayer.model.Media
@@ -15,6 +15,7 @@ import com.gene.libglayer.model.Media
 class MainViewModel : ViewModel(), ServiceConnection {
 
     val mediaList by lazy { MutableLiveData<MediaListMap>() }
+
     val playState by lazy { MutableLiveData<Int>() }
     val playProgress by lazy { MutableLiveData<Int>() }
     val playMedia by lazy { MutableLiveData<Media>() }
