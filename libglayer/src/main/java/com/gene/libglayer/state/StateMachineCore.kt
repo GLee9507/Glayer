@@ -34,23 +34,16 @@ class StateMachineCore(val controller: IController) :
         }
     }
 
-    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
-    }
-
-    override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
-
-    }
-
-    override fun onPositionDiscontinuity(reason: Int) {
-        Log.d("gll", reason.toString())
-    }
-
+    private var currentUriString: String? = null
     override fun onLoadStarted(
         eventTime: AnalyticsListener.EventTime?,
         loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
         mediaLoadData: MediaSourceEventListener.MediaLoadData?
     ) {
+        val uriString = loadEventInfo!!.uri.toString()
+        currentUriString = uriString
     }
+
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
 
         Log.d("onPlayerStateChanged", "$playWhenReady--$playbackState")
@@ -60,7 +53,9 @@ class StateMachineCore(val controller: IController) :
             }
             Player.STATE_READY -> {
                 if (playWhenReady) {
-                    transformTo(PlayingState::class.java, null)
+                    transformTo(
+                        PlayingState::class.java,
+                        Bundle().apply { putString("uri", currentUriString) })
                 } else {
                     transformTo(PauseState::class.java, null)
                 }
@@ -74,7 +69,9 @@ class StateMachineCore(val controller: IController) :
     }
 
     private fun <T> transformTo(clazz: Class<T>, bundle: Bundle?) where T : State {
-        currentState.quit()
+        if (!currentState::class.java.isAssignableFrom(clazz)) {
+            currentState.quit()
+        }
         currentState = State.get(clazz, this).apply { enter(bundle) }
     }
 

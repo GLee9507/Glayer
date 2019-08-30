@@ -13,7 +13,9 @@ class PlayingState(core: StateMachineCore) : State(core) {
         core.controller.callback {
             //TODO 添加loading状态
             it.onPlayStateChanged(PLAY_STATE_PLAYING)
-
+            bundle?.getString("uri")?.apply {
+                it.onPlayMediaChanged(this)
+            }
         }
     }
 
