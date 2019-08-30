@@ -20,10 +20,10 @@ class MainPresenter(private val viewModel: MainViewModel) {
     fun setPlayList() {
         send(BundlePool.take(CTRL_SET_LIST).apply {
             putString(CTRL_SET_LIST_TAG, "test")
-            putIntArray(CTRL_SET_LIST_PLAY_LIST,
+            putStringArray(CTRL_SET_LIST_PLAY_LIST,
                 viewModel.mediaList.value?.size()?.let { it ->
-                    IntArray(it, init = { i ->
-                        viewModel.mediaList.value!!.getAt(i).id
+                    Array(it, init = { i ->
+                        viewModel.mediaList.value!!.getAt(i).data!!
                     })
                 })
 

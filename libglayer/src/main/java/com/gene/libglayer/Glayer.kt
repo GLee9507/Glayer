@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 const val PLAY_STATE_PLAYING = 1
 const val PLAY_STATE_PAUSE = 2
 const val PLAY_STATE_IDLE = 3
+const val PLAY_STATE_LOADING = 4
 
 const val NO_MEDIA_ID = -1
 

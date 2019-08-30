@@ -8,10 +8,13 @@ import android.util.Log
 import com.gene.libglayer.CTRL_SCAN
 import com.gene.libglayer.CTRL_SET_LIST
 import com.gene.libglayer.IController
-import com.gene.libglayer.consume
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.source.MediaSourceEventListener
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 
 
 class StateMachineCore(val controller: IController) :
@@ -20,7 +23,7 @@ class StateMachineCore(val controller: IController) :
         HandlerThread("glayer-core-thread", 1000).apply {
             start()
         }.looper
-    ), Player.EventListener {
+    ), Player.EventListener, AnalyticsListener {
 
     private var currentState: State = State.get(IdleState::class.java, this).apply { enter(null) }
 
@@ -31,21 +34,33 @@ class StateMachineCore(val controller: IController) :
         }
     }
 
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
+    }
+
     override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
 
     }
 
+    override fun onPositionDiscontinuity(reason: Int) {
+        Log.d("gll", reason.toString())
+    }
 
+    override fun onLoadStarted(
+        eventTime: AnalyticsListener.EventTime?,
+        loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+        mediaLoadData: MediaSourceEventListener.MediaLoadData?
+    ) {
+    }
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
 
-        Log.d("onPlayerStateChanged" , "$playWhenReady--$playbackState")
+        Log.d("onPlayerStateChanged", "$playWhenReady--$playbackState")
         when (playbackState) {
             Player.STATE_IDLE -> {
-                transformTo(IdleState::class.java, null)
+//                transformTo(IdleState::class.java, null)
             }
             Player.STATE_READY -> {
                 if (playWhenReady) {
-                    transformTo(PlayState::class.java, null)
+                    transformTo(PlayingState::class.java, null)
                 } else {
                     transformTo(PauseState::class.java, null)
                 }

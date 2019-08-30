@@ -5,7 +5,7 @@ import android.os.Message
 import com.gene.libglayer.*
 
 
-class PlayState(core: StateMachineCore) : State(core) {
+class PlayingState(core: StateMachineCore) : State(core) {
 
     override fun enter(bundle: Bundle?) {
         super.enter(bundle)

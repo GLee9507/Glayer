@@ -5,9 +5,7 @@ import android.os.Message
 
 class EndState(core: StateMachineCore) : State(core) {
     override fun enter(bundle: Bundle?) {
-//        core.controllerext()
         super.enter(bundle)
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun quit() {

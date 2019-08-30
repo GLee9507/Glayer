@@ -32,9 +32,9 @@ class MainViewModel : ViewModel(), ServiceConnection {
             }
 
 
-            override fun onPlayMediaChanged(id: Int) {
+            override fun onPlayMediaChanged(uriString: String) {
                 mediaList.value?.apply {
-                    val media = getById(id)
+                    val media = get(uriString)
                     playMedia.postValue(media)
                 }
             }

@@ -8,7 +8,7 @@ import com.gene.libglayer.PLAY_STATE_IDLE
 class IdleState(core: StateMachineCore) : State(core) {
     override fun enter(bundle: Bundle?) {
         core.controller.callback {
-            it.onPlayMediaChanged(NO_MEDIA_ID)
+            it.onPlayMediaChanged(null)
             it.onPlayStateChanged(PLAY_STATE_IDLE)
         }
     }

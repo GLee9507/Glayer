@@ -5,13 +5,13 @@ import android.os.Bundle
 import androidx.databinding.Observable
 import com.gene.libglayer.model.Media
 import com.gene.libglayer.state.StateMachineCore
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.REPEAT_MODE_ALL
+import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 
 
@@ -25,8 +25,11 @@ class GlayerController : IGlayerController.Stub(), IController {
             APP,
             DefaultRenderersFactory(APP).apply { setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON) },
             DefaultTrackSelector(), DefaultLoadControl(), null, core.looper
-        ).apply { addListener(core)
-        repeatMode = REPEAT_MODE_ALL}
+        ).apply {
+            addListener(core)
+            addAnalyticsListener(core)
+            repeatMode = REPEAT_MODE_ALL
+        }
     }
 
 
@@ -116,6 +119,7 @@ class GlayerController : IGlayerController.Stub(), IController {
     }
 
     override fun seekTo(bundle: Bundle) {
+
         bundle.getLong(CTRL_SEEK_TO_POSITION, -1).apply {
             if (this >= 0) {
                 play()
@@ -128,7 +132,7 @@ class GlayerController : IGlayerController.Stub(), IController {
     private var currentMediaList: MediaListSource? = null
     override fun setPlayList(bundle: Bundle) {
         val tag = bundle.getString(CTRL_SET_LIST_TAG, "")
-        val playList = bundle.getIntArray(CTRL_SET_LIST_PLAY_LIST)!!
+        val playList = bundle.getStringArray(CTRL_SET_LIST_PLAY_LIST)!!
         val autoPlay = bundle.getBoolean(CTRL_SET_LIST_AUTO_PLAY)
         val playIndex = bundle.getInt(CTRL_SET_LIST_PLAY_INDEX)
         mediaRepo.get()?.apply {
@@ -139,7 +143,15 @@ class GlayerController : IGlayerController.Stub(), IController {
                 useLazyPreparation = true,
                 shuffleOrder = ShuffleOrder.DefaultShuffleOrder(0),
                 mediaListMap = MediaListMap(
-                    Array(playList.size) { getById(playList[it]) }
+                    ArrayList<Media>().apply {
+                        playList.filter {
+                            File(it).exists()
+                        }.forEach { uriString ->
+                            get(uriString)?.apply {
+                                add(this)
+                            }
+                        }
+                    }.toTypedArray()
                 )
             )
 
