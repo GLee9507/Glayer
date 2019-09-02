@@ -15,8 +15,8 @@ object BundlePool {
 
 
     fun release(bundle: Bundle) {
-        pool.release(bundle)
         bundle.clear()
+        pool.release(bundle)
     }
 
 }

@@ -11,7 +11,7 @@ abstract class State(val core: StateMachineCore) {
         Log.d("STATE", "enter : " + javaClass.simpleName)
     }
 
-    public  open fun quit() {
+    public open fun quit() {
         Log.d("STATE", "quit : " + javaClass.simpleName)
 
     }
@@ -20,7 +20,7 @@ abstract class State(val core: StateMachineCore) {
 
     companion object {
         private val map = ArrayMap<Class<*>, Any>()
-        fun <T> get(clazz: Class<T>, core: StateMachineCore): T {
+        fun <T> get(clazz: Class<T>, core: StateMachineCore): T where T : State {
             var state = map[clazz]
             if (state == null) {
                 val declaredConstructor = clazz.getDeclaredConstructor(StateMachineCore::class.java)

@@ -42,11 +42,18 @@ class StateMachineCore(val controller: IController) :
     ) {
         val uriString = loadEventInfo!!.uri.toString()
         currentUriString = uriString
+        Log.d("loadstart", uriString)
+        transformTo(
+            LoadingState::class.java,
+            Bundle().apply { putString("uri", currentUriString) })
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
 
-        Log.d("onPlayerStateChanged", "$playWhenReady--$playbackState")
+        Log.d(
+            "onPlayerStateChanged",
+            "$playWhenReady--$playbackState" + Thread.currentThread().name
+        )
         when (playbackState) {
             Player.STATE_IDLE -> {
 //                transformTo(IdleState::class.java, null)
@@ -54,8 +61,8 @@ class StateMachineCore(val controller: IController) :
             Player.STATE_READY -> {
                 if (playWhenReady) {
                     transformTo(
-                        PlayingState::class.java,
-                        Bundle().apply { putString("uri", currentUriString) })
+                        PlayingState::class.java, null
+                    )
                 } else {
                     transformTo(PauseState::class.java, null)
                 }
@@ -74,6 +81,4 @@ class StateMachineCore(val controller: IController) :
         }
         currentState = State.get(clazz, this).apply { enter(bundle) }
     }
-
-
 }
