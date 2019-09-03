@@ -3,7 +3,18 @@ package com.gene.glayer.net
 import com.google.gson.annotations.SerializedName
 
 data class AlbumInfo(
-    val album: Album
+    val album: Album = Album(
+        "",
+        ArrayList(),
+        "",
+        "",
+        "",
+        "",
+        Tags(ArrayList()),
+        Tracks(ArrayList()),
+        "",
+        Wiki("", "", "")
+    )
 )
 
 data class Album(

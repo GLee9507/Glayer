@@ -1,6 +1,7 @@
 package com.gene.glayer.ui.all
 
 import android.media.MediaMetadataRetriever
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.gene.glayer.R
-import com.gene.libglayer.APP
+import com.gene.glayer.net.NET
+import com.gene.libglayer.IO
+import com.gene.libglayer.UI
 import com.gene.libglayer.model.Media
+import com.gene.libglayer.withIoContext
 import kotlinx.coroutines.*
 
 val MEDIA_CALLBACK by lazy {
@@ -29,12 +32,6 @@ val MEDIA_CALLBACK by lazy {
 
 class AllMediaAdapter : ListAdapter<Media, AllMediaViewHolder>(MEDIA_CALLBACK) {
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        recyclerView.doOnDetach {
-
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         AllMediaViewHolder(
@@ -50,13 +47,28 @@ class AllMediaAdapter : ListAdapter<Media, AllMediaViewHolder>(MEDIA_CALLBACK) {
         holder.tvSinger.text = media.artist
         holder.tvSong.text = media.title
         holder.data = media
-        holder.job = CoroutineScope(Dispatchers.Main).async {
-            Log.d("g111", position.toString() + "load start")
-            val bitMap = getBitMap(media.data!!)
-            Log.d("g111", position.toString() + "load end")
-            Log.d("g111", position.toString() + "load comp")
+        holder.job?.cancel()
+        holder.job = UI.launch {
+            val bitMap = getBitMap(media.data)
+            if (bitMap == null) {
+                try {
+                    val albumInfo = NET.getAlbumInfo(media.artist, media.album)
+                    val image = albumInfo.album.image
+                    val text = image.lastOrNull {
+                        !TextUtils.isEmpty(it.text)
+                    }?.text
+                    if (TextUtils.isEmpty(text)) {
+                        return@launch
+                    }
+                    Glide.with(holder.ivAlbum)
+                        .load(text)
+                        .into(holder.ivAlbum).clearOnDetach()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else
+                Glide.with(holder.ivAlbum).load(bitMap).into(holder.ivAlbum).clearOnDetach()
         }
-        Log.d("g111", position.toString() + "load cancel")
     }
 
     override fun onViewRecycled(holder: AllMediaViewHolder) {
@@ -65,14 +77,21 @@ class AllMediaAdapter : ListAdapter<Media, AllMediaViewHolder>(MEDIA_CALLBACK) {
         holder.job?.cancel()
     }
 
-    private suspend fun getBitMap(uri: String) =
-        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
-            Log.d("g111", Thread.currentThread().name + "loading")
-            return@withContext MediaMetadataRetriever().apply {
-                setDataSource(uri)
-            }.embeddedPicture
+    private suspend fun getBitMap(uri: String?): ByteArray? {
+        if (uri == null) return null
+        return withIoContext {
+            Log.d("bitmap", Thread.currentThread().name)
+            return@withIoContext MediaMetadataRetriever().let {
+                it.setDataSource(uri)
+                return@let try {
+                    it.embeddedPicture
+                    null
+                } finally {
+                    it.release()
+                }
+            }
         }
-
+    }
 }
 
 
@@ -89,5 +108,6 @@ class AllMediaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val tvSinger: TextView by lazy { view.findViewById<TextView>(R.id.tvSingerTitle) }
     val tvSong: TextView by lazy { view.findViewById<TextView>(R.id.tvSongTitle) }
     val ivAlbum: ImageView by lazy { view.findViewById<ImageView>(R.id.ivAlbum) }
+
 
 }

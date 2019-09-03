@@ -7,6 +7,13 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.FileDataSourceFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 const val PLAY_STATE_PLAYING = 1
 const val PLAY_STATE_PAUSE = 2
@@ -42,19 +49,27 @@ val APP: Application by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
     AppHolder.getContext()
 
 }
-val dataSourceFactory by lazy { ProgressiveMediaSource.Factory(FileDataSourceFactory()) }
-
-
-val IO by lazy { CoroutineScope(Dispatchers.IO) }
-
-
-fun runOnMain(block: Runnable) {
-    mainHandler.post(block)
+val dataSourceFactory by lazy {
+    ProgressiveMediaSource.Factory(FileDataSourceFactory())
 }
 
-inline fun runOnMain(crossinline block: () -> Unit) {
-    mainHandler.post { block.invoke() }
+
+val IO by lazy { CoroutineScope(TP.asCoroutineDispatcher()) }
+val UI by lazy { CoroutineScope(Dispatchers.Main) }
+
+val TP by lazy {
+    ThreadPoolExecutor(
+        0, Int.MAX_VALUE, 60, TimeUnit.SECONDS,
+        SynchronousQueue(), object : ThreadFactory {
+            private val int = AtomicInteger()
+            override fun newThread(r: Runnable?) = Thread(r, "glee-thread-" + int.incrementAndGet())
+
+        }
+    )
 }
+
+suspend fun <T> withIoContext(block: suspend CoroutineScope.() -> T) =
+    withContext(IO.coroutineContext, block = block)
 
 inline fun consume(block: () -> Unit): Boolean {
     block()
