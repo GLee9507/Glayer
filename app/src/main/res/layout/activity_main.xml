@@ -75,9 +75,9 @@
                 android:id="@+id/btnNext"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:onClick="@{()->viewModel.presenter.next()}"
-
                 android:layout_marginRight="10dp"
+
+                android:onClick="@{()->viewModel.presenter.next()}"
                 android:src="@android:drawable/ic_media_next"
                 app:layout_constraintBottom_toBottomOf="@id/bottomBar"
                 app:layout_constraintRight_toRightOf="@id/bottomBar"
@@ -94,12 +94,12 @@
                 app:layout_constraintRight_toLeftOf="@id/btnNext"
                 app:layout_constraintTop_toTopOf="@+id/bottomBar" />
 
-        <ProgressBar
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        <SeekBar
+                android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="@{viewModel.playMedia.duration}"
-                android:progress="@{viewModel.playProgress}"
+                android:thumb="@null"
                 app:layout_constraintBottom_toBottomOf="@id/bottomBar"
                 app:layout_constraintLeft_toLeftOf="@id/bottomBar"
                 app:layout_constraintRight_toRightOf="@id/bottomBar" />

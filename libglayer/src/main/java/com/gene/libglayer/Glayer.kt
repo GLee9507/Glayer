@@ -76,4 +76,5 @@ inline fun consume(block: () -> Unit): Boolean {
     return true
 }
 
-val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+fun String?.isEmptyOrNull() =
+    this == null || this.isEmpty()

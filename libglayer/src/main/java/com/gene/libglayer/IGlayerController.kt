@@ -14,6 +14,7 @@ interface IController {
     fun setPlayList(bundle: Bundle)
     fun callback(function: (EventListener) -> Unit)
     fun scan(bundle: Bundle)
-    fun currentPosition():Long
-    fun currentIndex():Int
+    fun currentPosition(): Long
+    fun currentIndex(): Int
+    fun getCurrentSourceUri(): String?
 }

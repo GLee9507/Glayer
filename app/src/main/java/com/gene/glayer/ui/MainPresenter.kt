@@ -17,6 +17,10 @@ class MainPresenter(private val viewModel: MainViewModel) {
         send(BundlePool.take(CTRL_PRE))
     }
 
+    fun seek(progress: Int) {
+        send(BundlePool.take(CTRL_SEEK_TO).apply { putInt(CTRL_SEEK_TO_POSITION, progress) })
+    }
+
     fun setPlayList() {
         send(BundlePool.take(CTRL_SET_LIST).apply {
             putString(CTRL_SET_LIST_TAG, "test")

@@ -1,6 +1,8 @@
 package com.gene.glayer.ui
 
+import android.os.Build
 import android.os.Bundle
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         val contentView =
             DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         contentView.lifecycleOwner = this
-        val viewModel:MainViewModel = ViewModelProvider(
+        val viewModel: MainViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(APP)
         )[MainViewModel::class.java]
@@ -39,8 +41,30 @@ class MainActivity : AppCompatActivity() {
         viewModel.mediaList.observe(this, Observer {
             viewModel.presenter.setPlayList()
         })
+        var onTouch = false
+        viewModel.playProgress.observe(this, Observer {
+            if (onTouch) {
+                return@Observer
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                contentView.seekBar.setProgress(it, true)
+            } else {
+                contentView.seekBar.progress = it
+            }
+        })
+        contentView.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                onTouch = true
+            }
 
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                onTouch = false
+                viewModel.presenter.seek(seekBar.progress)
+            }
+        })
     }
 
     override fun onStart() {

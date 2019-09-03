@@ -10,15 +10,14 @@ class PlayingState(core: StateMachineCore) : State(core) {
 
     override fun enter(bundle: Bundle?) {
         super.enter(bundle)
-        Log.d("PlayingState",bundle.toString())
+        Log.d("PlayingState", bundle.toString())
         core.sendEmptyMessageDelayed(CALLBACK_PROGRESS, 0)
-//        core.controller.callback {
-//            //TODO 添加loading状态
-//            it.onPlayStateChanged(PLAY_STATE_PLAYING)
-//            bundle?.getString("uri")?.apply {
-//                it.onPlayMediaChanged(this)
-//            }
-//        }
+        core.controller.callback {
+            it.onPlayStateChanged(PLAY_STATE_PLAYING)
+            bundle?.getString("uri")?.apply {
+                it.onPlayMediaChanged(this)
+            }
+        }
     }
 
     override fun handle(msg: Message) = when (msg.what) {
